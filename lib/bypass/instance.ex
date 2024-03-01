@@ -209,6 +209,9 @@ defmodule Bypass.Instance do
 
     result =
       cond do
+        all_stubs_or_no_expectation(state.expectations) ->
+          :ok
+
         state.pass ->
           :ok
 
@@ -223,6 +226,12 @@ defmodule Bypass.Instance do
       end
 
     {result, updated_state}
+  end
+
+  defp all_stubs_or_no_expectation(expectations) do
+    Enum.all?(expectations, fn {{_method, _path}, expectation} ->
+      expectation.expected == :none_or_more
+    end)
   end
 
   defp put_result(route, ref, result, state) do
